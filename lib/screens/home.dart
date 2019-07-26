@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../models/homeModel.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -100,21 +105,35 @@ class _Home extends State<Home> {
             ],
           ),
         ),
-        body: Apps(),
+        body: ShowApps(),
       ),
       textDirection: TextDirection.rtl,
     );
   }
 }
 
-class Apps extends StatefulWidget {
+class ShowApps extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _Apps();
+    return _ShowApps();
   }
 }
 
-class _Apps extends State<Apps> {
+class _ShowApps extends State<ShowApps> {
+  List<Apps> list;
+
+  Future<List<Apps>> getApps() async {
+    final response =
+        await http.get('https://jsonplaceholder.typicode.com/todos');
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      list = data.map<Apps>((json) => Apps.fromJson(json)).toList();
+      return list;
+    } else {
+      throw Exception('اطلاعات دریافت نشد');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var fullWidth = MediaQuery.of(context).size.width * 1;
@@ -152,339 +171,113 @@ class _Apps extends State<Apps> {
                     scrollDirection: Axis.horizontal,
                     itemCount: 17,
                     itemBuilder: (BuildContext context, int index) {
-                      return FlatButton(
-                        padding: EdgeInsets.all(0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                               ),
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Container(
-                                child: Image.network(
-                                    'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text('برنامه شماره 1'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text(
-                                  'شرکت برنامه نویسی',
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 11),
+                      return FutureBuilder(
+                        future: getApps(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData) {
+                            return SizedBox(
+                              width: 120,
+                              child: FlatButton(
+                                padding: EdgeInsets.all(0),
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      margin: EdgeInsets.all(10),
+                                      width: 100,
+                                      height: 100,
+                                      child: Container(
+                                        child: Image.network(
+                                            'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        width: 130,
+                                        child: Container(child: Text('برنامه شماره 1 '),),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        width: 130,
+                                        child: Container(child: Text(
+                                          'شرکت برنامه نویسی',
+                                          style: TextStyle(
+                                              color: Colors.grey[500],
+                                              fontSize: 11),
+                                        ),)
+                                      ),
+                                    )
+                                  ],
                                 ),
+                                onPressed: () {},
                               ),
-                            )
-                          ],
-                        ), onPressed: () {},
+                            );
+                          } else {
+                            return SizedBox(
+                              width: 120,
+                              child: FlatButton(
+                                padding: EdgeInsets.all(0),
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      // decoration: BoxDecoration(
+                                      //   borderRadius: BorderRadius.circular(10),
+                                      // ),
+                                      color: Colors.grey[200],
+                                      margin: EdgeInsets.all(10),
+                                      width: 100,
+                                      height: 100,
+                                      child: Container(width: 0,height: 0,),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        alignment:Alignment.centerRight,
+                                        width: 130,
+                                        height: 30,
+                                        padding: EdgeInsets.symmetric(horizontal: 12,vertical: 5),
+                                        child: Container(width: 80,height: 30,color: Colors.grey[200],),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        alignment:Alignment.centerRight,
+                                        width: 130,
+                                        height: 30,
+                                        padding: EdgeInsets.symmetric(horizontal: 12,vertical: 5),
+                                        child: Container(width: 100,height: 20,color: Colors.grey[200],),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                onPressed: () {},
+                              ),
+                            );
+                          }
+                        },
                       );
                     },
                   ),
                 ),
               ],
             ),
-          ),
-          Container(height: 1,width: fullWidth,color: Colors.grey[300],margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10,),),
-          /////////////////////////// Secend Section of Apps ///////////////////////////////
-          
-          RaisedButton(
-            padding: EdgeInsets.all(0),
-            onPressed: () {},
-            child: ListTile(
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 20,
-                color: Colors.grey[500],
-              ),
-              leading: Text(
-                'برترین بازی ها',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            color: Colors.transparent,
-            elevation: 0,
           ),
           Container(
-            height: 180,
+            height: 1,
             width: fullWidth,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Container(
-                  height: 180,
-                  width: fullWidth,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 17,
-                    itemBuilder: (BuildContext context, int index) {
-                      return FlatButton(
-                        padding: EdgeInsets.all(0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                               ),
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Container(
-                                child: Image.network(
-                                    'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text('برنامه شماره 1'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text(
-                                  'شرکت برنامه نویسی',
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 11),
-                                ),
-                              ),
-                            )
-                          ],
-                        ), onPressed: () {},
-                      );
-                    },
-                  ),
-                ),
-              ],
+            color: Colors.grey[300],
+            margin: EdgeInsets.symmetric(
+              vertical: 5,
+              horizontal: 10,
             ),
           ),
-          Container(height: 1,width: fullWidth,color: Colors.grey[300],margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10,),),
-
-          //////////////////////////// Third Section of Apps /////////////////////////////////////
-          
-          RaisedButton(
-            padding: EdgeInsets.all(0),
-            onPressed: () {},
-            child: ListTile(
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 20,
-                color: Colors.grey[500],
-              ),
-              leading: Text(
-                'برترین بازی ها',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            color: Colors.transparent,
-            elevation: 0,
-          ),
-          Container(
-            height: 180,
-            width: fullWidth,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Container(
-                  height: 180,
-                  width: fullWidth,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 17,
-                    itemBuilder: (BuildContext context, int index) {
-                      return FlatButton(
-                        padding: EdgeInsets.all(0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                               ),
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Container(
-                                child: Image.network(
-                                    'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text('برنامه شماره 1'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text(
-                                  'شرکت برنامه نویسی',
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 11),
-                                ),
-                              ),
-                            )
-                          ],
-                        ), onPressed: () {},
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(height: 1,width: fullWidth,color: Colors.grey[300],margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10,),),
-
-          ///////////////////// Section Four of Apps //////////////////////////////////
-          
-
-          RaisedButton(
-            padding: EdgeInsets.all(0),
-            onPressed: () {},
-            child: ListTile(
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 20,
-                color: Colors.grey[500],
-              ),
-              leading: Text(
-                'برترین بازی ها',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            color: Colors.transparent,
-            elevation: 0,
-          ),
-          Container(
-            height: 180,
-            width: fullWidth,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Container(
-                  height: 180,
-                  width: fullWidth,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 17,
-                    itemBuilder: (BuildContext context, int index) {
-                      return FlatButton(
-                        padding: EdgeInsets.all(0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                               ),
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Container(
-                                child: Image.network(
-                                    'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text('برنامه شماره 1'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text(
-                                  'شرکت برنامه نویسی',
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 11),
-                                ),
-                              ),
-                            )
-                          ],
-                        ), onPressed: () {},
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(height: 1,width: fullWidth,color: Colors.grey[300],margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10,),),
-
-          //////////////// Section Five of Apps /////////////////////////////////
-          
-
-          RaisedButton(
-            padding: EdgeInsets.all(0),
-            onPressed: () {},
-            child: ListTile(
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 20,
-                color: Colors.grey[500],
-              ),
-              leading: Text(
-                'برترین بازی ها',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            color: Colors.transparent,
-            elevation: 0,
-          ),
-          Container(
-            height: 180,
-            width: fullWidth,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Container(
-                  height: 180,
-                  width: fullWidth,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 17,
-                    itemBuilder: (BuildContext context, int index) {
-                      return FlatButton(
-                        padding: EdgeInsets.all(0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                               ),
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Container(
-                                child: Image.network(
-                                    'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text('برنامه شماره 1'),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Text(
-                                  'شرکت برنامه نویسی',
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 11),
-                                ),
-                              ),
-                            )
-                          ],
-                        ), onPressed: () {},
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(height: 1,width: fullWidth,color: Colors.grey[300],margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10,),),
         ],
       ),
     );
