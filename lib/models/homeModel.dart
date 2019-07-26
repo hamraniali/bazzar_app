@@ -5,8 +5,14 @@ import 'package:http/http.dart' as http;
 
 class Apps {
   String title;
-  Apps({this.title});
+  String thumbnailUrl;
+  int id;
+  Apps({this.title , this.thumbnailUrl , this.id});
   factory Apps.fromJson(Map<String,dynamic> json) {
-    return Apps(title: json['title']);
+    return Apps(
+      title: json['title'],
+      thumbnailUrl : json['thumbnailUrl'],
+      id: json['id']
+      );
   }
 }

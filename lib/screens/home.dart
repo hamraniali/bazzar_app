@@ -124,7 +124,7 @@ class _ShowApps extends State<ShowApps> {
 
   Future<List<Apps>> getApps() async {
     final response =
-        await http.get('https://jsonplaceholder.typicode.com/todos');
+        await http.get('https://jsonplaceholder.typicode.com/photos');
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       list = data.map<Apps>((json) => Apps.fromJson(json)).toList();
@@ -176,6 +176,7 @@ class _ShowApps extends State<ShowApps> {
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData) {
+                            String title = snapshot.data[index].title;
                             return SizedBox(
                               width: 120,
                               child: FlatButton(
@@ -183,15 +184,14 @@ class _ShowApps extends State<ShowApps> {
                                 child: Column(
                                   children: <Widget>[
                                     Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
+                                      // decoration: BoxDecoration(
+                                      //   borderRadius: BorderRadius.circular(30),
+                                      // ),
                                       margin: EdgeInsets.all(10),
                                       width: 100,
                                       height: 100,
                                       child: Container(
-                                        child: Image.network(
-                                            'https://dl.myket.ir/newresizing/resize/medium/png/icon/app.tandori.network_2e7db903-23c3-499f-9e49-547e85311a57.png'),
+                                        child: Image.network(snapshot.data[index].thumbnailUrl),
                                       ),
                                     ),
                                     Expanded(
@@ -199,7 +199,7 @@ class _ShowApps extends State<ShowApps> {
                                         alignment: Alignment.centerRight,
                                         padding: EdgeInsets.symmetric(horizontal: 12),
                                         width: 130,
-                                        child: Container(child: Text('برنامه شماره 1 '),),
+                                        child: Container(child: Text(title,maxLines: 1,),),
                                       ),
                                     ),
                                     Expanded(
